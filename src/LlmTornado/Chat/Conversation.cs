@@ -1857,32 +1857,33 @@ public class Conversation
 
                             await Threading.WhenAll(fnTask, customTask);
 
+                            if (MostRecentApiResult?.Choices?.Count > 0 &&
+                                MostRecentApiResult.Choices[0].FinishReason is ChatMessageFinishReasons
+                                    .ToolCalls)
+                            {
+                                delta.Content = MostRecentApiResult.Object;
+                            }
+
+                            if (lastUserMessage is not null)
+                            {
+                                lastUserMessage.Tokens = res.Usage?.PromptTokens;
+                            }
+
+                            if (res.Usage is not null && eventsHandler.OnUsageReceived is not null)
+                            {
+                                await eventsHandler.OnUsageReceived.Invoke(res.Usage);
+                            }
+
+                            delta.Tokens = res.Usage?.CompletionTokens;
+                            AppendMessage(delta);
+
                             if (eventsHandler.FunctionCallHandler is not null || eventsHandler.ToolCallsHandler is not null || eventsHandler.CustomToolCallHandler is not null)
                             {
                                 ResolvedToolsCall result = new ResolvedToolsCall();
 
                                 if (parsedCalls.FunctionCalls.Count > 0 || parsedCalls.CustomToolCalls.Count > 0)
                                 {
-                                    if (MostRecentApiResult?.Choices?.Count > 0 &&
-                                        MostRecentApiResult.Choices[0].FinishReason is ChatMessageFinishReasons
-                                            .ToolCalls)
-                                    {
-                                        delta.Content = MostRecentApiResult.Object;
-                                    }
-
-                                    if (lastUserMessage is not null)
-                                    {
-                                        lastUserMessage.Tokens = res.Usage?.PromptTokens;
-                                    }
-
-                                    if (res.Usage is not null && eventsHandler.OnUsageReceived is not null)
-                                    {
-                                        await eventsHandler.OnUsageReceived.Invoke(res.Usage);
-                                    }
-
-                                    delta.Tokens = res.Usage?.CompletionTokens;
                                     result.AssistantMessage = delta;
-                                    AppendMessage(delta);
 
                                     foreach (FunctionCall call in parsedCalls.FunctionCalls)
                                     {
@@ -1943,9 +1944,16 @@ public class Conversation
                                         await OnAfterToolsCall(result);
                                     }
                                 }
-
-                                return;
                             }
+
+                            if (eventsHandler.OnFinished is not null)
+                            {
+                                await eventsHandler.OnFinished.Invoke(new ChatStreamFinishedData(
+                                    res.Usage ?? new ChatUsage(provider.Provider), 
+                                    ChatMessageFinishReasons.ToolCalls));
+                            }
+
+                            return;
                         }
                         else if (delta.Role is ChatMessageRoles.Assistant)
                         {
