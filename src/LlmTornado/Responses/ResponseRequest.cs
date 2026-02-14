@@ -216,6 +216,14 @@ public class ResponseRequest
     /// </summary>
     [JsonProperty("verbosity")]
     public ChatRequestVerbosities? Verbosity { get; set; }
+    
+    /// <summary>
+    /// Configuration for server-side context management. When set, the server can automatically compact the conversation
+    /// when the rendered token count crosses the configured threshold. The compaction item is emitted in the response stream
+    /// and carries forward key prior state using fewer tokens.
+    /// </summary>
+    [JsonProperty("context_management")]
+    public List<ResponseContextManagementItem>? ContextManagement { get; set; }
 
     /// <summary>
     ///	Serializes the chat request into the request body, based on the conventions used by the LLM provider.
