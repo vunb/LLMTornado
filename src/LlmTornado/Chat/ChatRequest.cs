@@ -691,6 +691,15 @@ public class ChatRequest : IModelRequest, ISerializableRequest, IHeaderProvider
 				JsonSerializerSettings serializer = GetSerializer(EndpointBase.NullSettings, a);
 				return PreparePayload(request.Serialize(serializer), x, y, z, serializer);
 			}
+		},
+		{
+			LLmProviders.MiniMax, (x, y, z, a) =>
+			{
+				x.LogitBias = null;
+				x.FrequencyPenalty = null;
+				x.PresencePenalty = null;
+				return PreparePayload(x, x, y, z, GetSerializer(EndpointBase.NullSettings, a));
+			}
 		}
 	};
 

@@ -1614,6 +1614,10 @@ public enum LLmProviders
     /// </summary>
     Upstage,
     /// <summary>
+    /// MiniMax.
+    /// </summary>
+    MiniMax,
+    /// <summary>
     /// Internal value.
     /// </summary>
     Length
@@ -1812,7 +1816,15 @@ public enum CapabilityEndpoints
     /// <summary>
     /// OCR endpoint.
     /// </summary>
-    Ocr
+    Ocr,
+    /// <summary>
+    /// Music generation endpoint.
+    /// </summary>
+    Music,
+    /// <summary>
+    /// Lyrics generation endpoint.
+    /// </summary>
+    Lyrics
 }
 
 /// <summary>

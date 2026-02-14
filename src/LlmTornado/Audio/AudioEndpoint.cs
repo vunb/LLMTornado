@@ -7,7 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using LlmTornado.Code;
 using LlmTornado.Audio.Models;
+using LlmTornado.Audio.Models;
 using LlmTornado.Audio.Models.OpenAi;
+using LlmTornado.Audio.Vendors.MiniMax;
 using LlmTornado.Audio.Vendors.Zai;
 using Newtonsoft.Json;
 
@@ -62,6 +64,36 @@ public class AudioEndpoint : EndpointBase
     public Task<SpeechTtsResult?> CreateSpeech(SpeechRequest request)
     {
         return PostSpeech(request);
+    }
+    
+    /// <summary>
+    /// Generates music from lyrics and an optional style/mood prompt.
+    /// Currently supported by MiniMax.
+    /// </summary>
+    /// <param name="request">The music generation request containing lyrics and style description.</param>
+    /// <returns>The generated music result with audio data and metadata.</returns>
+    public async Task<MusicGenerationResult?> GenerateMusic(MusicGenerationRequest request)
+    {
+        IEndpointProvider provider = Api.GetProvider(request.Model ?? AudioModel.MiniMax.Music.Music25);
+        string url = provider.ApiUrl(CapabilityEndpoints.Music, null);
+        string json = JsonConvert.SerializeObject(new VendorMiniMaxMusicRequest(request), EndpointBase.NullSettings);
+        
+        return await HttpPost1<MusicGenerationResult>(provider, CapabilityEndpoints.Music, url, postData: json);
+    }
+    
+    /// <summary>
+    /// Generates lyrics for a song, supporting full song creation and lyrics editing/continuation.
+    /// Currently supported by MiniMax.
+    /// </summary>
+    /// <param name="request">The lyrics generation request with mode, prompt, and optional existing lyrics.</param>
+    /// <returns>The generated lyrics with song title and style tags.</returns>
+    public async Task<LyricsGenerationResult?> GenerateLyrics(LyricsGenerationRequest request)
+    {
+        IEndpointProvider provider = Api.ResolveProvider(LLmProviders.MiniMax);
+        string url = provider.ApiUrl(CapabilityEndpoints.Lyrics, null);
+        string json = JsonConvert.SerializeObject(new VendorMiniMaxLyricsRequest(request), EndpointBase.NullSettings);
+        
+        return await HttpPost1<LyricsGenerationResult>(provider, CapabilityEndpoints.Lyrics, url, postData: json);
     }
 
     private async Task<SpeechTtsResult?> PostSpeech(SpeechRequest request)

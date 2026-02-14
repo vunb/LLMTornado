@@ -10,7 +10,10 @@ using System.Text;
 using LlmTornado.Chat;
 using LlmTornado.Chat.Vendors.Cohere;
 using LlmTornado.Chat.Vendors.Perplexity;
+using LlmTornado.Audio;
+using LlmTornado.Audio.Vendors.MiniMax;
 using LlmTornado.Chat.Vendors.XAi;
+using LlmTornado.Images;
 using LlmTornado.Code.Models;
 using LlmTornado.Code.Sse;
 using LlmTornado.Infra;
@@ -72,6 +75,10 @@ public class OpenAiEndpointProvider : BaseEndpointProvider, IEndpointProvider, I
             // variant providers overrides
             CapabilityEndpoints.Chat when provider is LLmProviders.Cohere => "chat",
             CapabilityEndpoints.Tokenize when provider is LLmProviders.MoonshotAi => "tokenizers/estimate-token-count",
+            CapabilityEndpoints.Videos when provider is LLmProviders.MiniMax => "video_generation",
+            CapabilityEndpoints.ImageGeneration when provider is LLmProviders.MiniMax => "image_generation",
+            CapabilityEndpoints.Music when provider is LLmProviders.MiniMax => "music_generation",
+            CapabilityEndpoints.Lyrics when provider is LLmProviders.MiniMax => "lyrics_generation",
             // default endpoints
             CapabilityEndpoints.Audio => "audio",
             CapabilityEndpoints.Chat => "chat/completions",
@@ -201,6 +208,9 @@ public class OpenAiEndpointProvider : BaseEndpointProvider, IEndpointProvider, I
             LLmProviders.Perplexity => InboundMessageVariantProviderPerplexity<T>(jsonData, postData),
             LLmProviders.Zai => InboundMessageVariantProviderZai<T>(jsonData, postData),
             LLmProviders.MoonshotAi when typeof(T) == typeof(Tokenize.TokenizeResult) => (T?)(object?)Tokenize.TokenizeResult.Deserialize(LLmProviders.MoonshotAi, jsonData, postData),
+            LLmProviders.MiniMax when typeof(T) == typeof(ImageGenerationResult) => (T?)(object?)ImageGenerationResult.Deserialize(LLmProviders.MiniMax, jsonData, postData),
+            LLmProviders.MiniMax when typeof(T) == typeof(MusicGenerationResult) => (T?)(object?)JsonConvert.DeserializeObject<VendorMiniMaxMusicResponse>(jsonData)?.ToResult(),
+            LLmProviders.MiniMax when typeof(T) == typeof(LyricsGenerationResult) => (T?)(object?)JsonConvert.DeserializeObject<VendorMiniMaxLyricsResponse>(jsonData)?.ToResult(),
             _ => JsonConvert.DeserializeObject<T>(jsonData)
         };
     }

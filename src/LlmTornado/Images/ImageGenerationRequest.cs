@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using LlmTornado.Code;
 using LlmTornado.Images.Models;
 using LlmTornado.Images.Vendors.Google;
+using LlmTornado.Images.Vendors.MiniMax;
 using LlmTornado.Images.Vendors.XAi;
 using Newtonsoft.Json;
 
@@ -234,7 +235,8 @@ public class ImageGenerationRequest
 	{
 		{ LLmProviders.OpenAi, (x, y) => JsonConvert.SerializeObject(x, EndpointBase.NullSettings)},
 		{ LLmProviders.XAi, (x, y) => JsonConvert.SerializeObject(new VendorXAiImageRequest(x, y), EndpointBase.NullSettings) },
-		{ LLmProviders.Google, (x, y) => JsonConvert.SerializeObject(new VendorGoogleImageRequest(x, y), EndpointBase.NullSettings) }
+		{ LLmProviders.Google, (x, y) => JsonConvert.SerializeObject(new VendorGoogleImageRequest(x, y), EndpointBase.NullSettings) },
+		{ LLmProviders.MiniMax, (x, y) => JsonConvert.SerializeObject(new VendorMiniMaxImageRequest(x, y), EndpointBase.NullSettings) }
 	}.ToFrozenDictionary();
 }
 
