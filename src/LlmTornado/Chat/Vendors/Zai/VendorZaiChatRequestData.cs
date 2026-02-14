@@ -58,8 +58,9 @@ internal class VendorZaiChatRequestData : ChatRequest
     {
         // Map existing ChatRequest properties to ZAI-specific JSON properties
         UserId = request.User;
+        User = null; // ZAI uses user_id, not user
         
-        // Map reasoning from ReasoningEffort and ReasoningBudget
+        // Map reasoning from ReasoningEffort and ReasoningBudget to ZAI's thinking parameter
         if (ShouldEnableReasoning(request))
         {
             Thinking = new ChatRequestVendorZaiThinking
@@ -67,6 +68,10 @@ internal class VendorZaiChatRequestData : ChatRequest
                 Type = ChatRequestVendorZaiThinkingType.Enabled
             };
         }
+        
+        // Clear OpenAI-specific reasoning fields that don't apply to ZAI
+        ReasoningEffort = null;
+        ReasoningBudget = null;
         
         // Convert tools to ZAI-specific format
         if (request.Tools is { Count: > 0 })

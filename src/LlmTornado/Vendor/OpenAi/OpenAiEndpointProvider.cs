@@ -199,6 +199,7 @@ public class OpenAiEndpointProvider : BaseEndpointProvider, IEndpointProvider, I
             LLmProviders.Cohere => InboundMessageVariantProviderCohere<T>(jsonData, postData),
             LLmProviders.Mistral => InboundMessageVariantProviderMistral<T>(jsonData, postData),
             LLmProviders.Perplexity => InboundMessageVariantProviderPerplexity<T>(jsonData, postData),
+            LLmProviders.Zai => InboundMessageVariantProviderZai<T>(jsonData, postData),
             LLmProviders.MoonshotAi when typeof(T) == typeof(Tokenize.TokenizeResult) => (T?)(object?)Tokenize.TokenizeResult.Deserialize(LLmProviders.MoonshotAi, jsonData, postData),
             _ => JsonConvert.DeserializeObject<T>(jsonData)
         };
@@ -229,6 +230,16 @@ public class OpenAiEndpointProvider : BaseEndpointProvider, IEndpointProvider, I
         if (typeof(T) == typeof(ChatResult))
         {
             return (T?)(object?)ChatResultVendorPerplexity.Deserialize(jsonData);
+        }
+        
+        return JsonConvert.DeserializeObject<T>(jsonData);
+    }
+    
+    static T? InboundMessageVariantProviderZai<T>(string jsonData, string? postData)
+    {
+        if (typeof(T) == typeof(ChatResult))
+        {
+            return (T?)(object?)Chat.Vendors.Zai.ChatResultVendorZai.Deserialize(jsonData);
         }
         
         return JsonConvert.DeserializeObject<T>(jsonData);
@@ -289,6 +300,7 @@ public class OpenAiEndpointProvider : BaseEndpointProvider, IEndpointProvider, I
                 LLmProviders.XAi => InboundMessageVariantProviderXAi<ChatResult>(item.Data, null),
                 LLmProviders.Cohere => InboundMessageVariantProviderCohere<ChatResult>(item.Data, null),
                 LLmProviders.Mistral => InboundMessageVariantProviderMistral<ChatResult>(item.Data, null),
+                LLmProviders.Zai => InboundMessageVariantProviderZai<ChatResult>(item.Data, null),
                 _ => JsonConvert.DeserializeObject<ChatResult>(item.Data)
             };
      
@@ -313,6 +325,21 @@ public class OpenAiEndpointProvider : BaseEndpointProvider, IEndpointProvider, I
                             XAi = new ChatResponseVendorXAiExtensions
                             {
                                 Citations = xAiRes.Citations
+                            }
+                        };
+                    }
+
+                    break;
+                }
+                case LLmProviders.Zai:
+                {
+                    if (res is Chat.Vendors.Zai.ChatResultVendorZai { WebSearch.Count: > 0 } zaiRes)
+                    {
+                        vendorExtensions = new ChatResponseVendorExtensions
+                        {
+                            Zai = new Chat.Vendors.Zai.ChatResponseVendorZaiExtensions
+                            {
+                                WebSearchResults = zaiRes.WebSearch
                             }
                         };
                     }
