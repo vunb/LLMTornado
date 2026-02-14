@@ -664,7 +664,35 @@ public enum ChatRequestServiceTiers
     ///  Only use standard tier capacity, useful if you don't want to use your Priority Tier capacity, supported only by Anthropic.
     /// </summary>
     [EnumMember(Value = "standard_only")]
-    StandardOnly
+    StandardOnly,
+    
+    /// <summary>
+    /// The request was served using priority tier capacity. This is a response-only value returned by Anthropic.
+    /// </summary>
+    [EnumMember(Value = "priority")]
+    Priority
+}
+
+/// <summary>
+/// Controls the inference speed tier for supported models. Currently supported by Anthropic (Claude Opus 4.6+).
+/// Fast mode provides significantly faster output token generation at premium pricing.
+/// </summary>
+[JsonConverter(typeof(StringEnumConverter))]
+public enum ChatRequestSpeeds
+{
+    /// <summary>
+    /// Standard inference speed. This is the default when no speed is specified.
+    /// This value is returned in responses to indicate standard speed was used.
+    /// </summary>
+    [EnumMember(Value = "standard")]
+    Standard,
+
+    /// <summary>
+    /// Fast mode. Up to 2.5x higher output tokens per second compared to standard speed. Premium pricing applies.
+    /// Supported by Anthropic on Claude Opus 4.6.
+    /// </summary>
+    [EnumMember(Value = "fast")]
+    Fast
 }
 
 /// <summary>

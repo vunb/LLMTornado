@@ -617,6 +617,14 @@ internal class VendorAnthropicChatRequest
     [JsonConverter(typeof(StringEnumConverter))]
     public AnthropicInferenceGeoOptions? InferenceGeo { get; set; }
     
+    [JsonProperty("service_tier")]
+    [JsonConverter(typeof(StringEnumConverter))]
+    public ChatRequestServiceTiers? ServiceTier { get; set; }
+    
+    [JsonProperty("speed")]
+    [JsonConverter(typeof(StringEnumConverter))]
+    public ChatRequestSpeeds? Speed { get; set; }
+    
     public VendorAnthropicChatRequest(ChatRequest request, IEndpointProvider provider)
     {
         Model = request.Model?.Name ?? ChatModel.Anthropic.Claude4.Sonnet250514.Name;
@@ -791,6 +799,18 @@ internal class VendorAnthropicChatRequest
             }
 
             request.VendorExtensions.Anthropic.OutboundRequest?.Invoke(System, Messages.Select(x => x.Content).ToList(), Tools);
+        }
+        
+        // Handle service tier (Anthropic supports "auto" and "standard_only")
+        if (request.ServiceTier is ChatRequestServiceTiers.Auto or ChatRequestServiceTiers.StandardOnly)
+        {
+            ServiceTier = request.ServiceTier;
+        }
+        
+        // Handle fast mode using harmonized Speed
+        if (request.Speed is ChatRequestSpeeds.Fast)
+        {
+            Speed = ChatRequestSpeeds.Fast;
         }
         
         // Handle effort parameter using harmonized ReasoningEffort (Claude Opus 4.5+)

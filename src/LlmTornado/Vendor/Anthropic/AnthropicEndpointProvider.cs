@@ -275,6 +275,16 @@ public class AnthropicEndpointProvider : BaseEndpointProvider, IEndpointProvider
         return modelName.StartsWith("claude-opus-4-6", StringComparison.OrdinalIgnoreCase);
     }
     
+    private static bool RequiresFastModeHeader(object? data)
+    {
+        if (data is not ChatRequest chatRequest)
+        {
+            return false;
+        }
+        
+        return chatRequest.Speed is ChatRequestSpeeds.Fast;
+    }
+    
     private static bool RequiresAdvancedToolUseHeader(object? data)
     {
         if (data is not ChatRequest chatRequest)
@@ -333,6 +343,8 @@ public class AnthropicEndpointProvider : BaseEndpointProvider, IEndpointProvider
         ChatMessageFinishReasons finishReason = ChatMessageFinishReasons.Unknown;
         ChatMessagePart? currentPart = null;
         StringBuilder currentPartTextBuilder = new StringBuilder();
+        ChatRequestServiceTiers? serviceTier = null;
+        ChatRequestSpeeds? speed = null;
         
         #if DEBUG
         List<string> items = [];
@@ -713,6 +725,19 @@ public class AnthropicEndpointProvider : BaseEndpointProvider, IEndpointProvider
                             CacheCreationTokens = res.Message.Usage.CacheCreationInputTokens,
                             CacheReadTokens = res.Message.Usage.CacheReadInputTokens
                         };
+                        
+                        serviceTier = res.Message.Usage.ServiceTier switch
+                        {
+                            "priority" => ChatRequestServiceTiers.Priority,
+                            _ => null
+                        };
+                        
+                        speed = res.Message.Usage.Speed switch
+                        {
+                            "fast" => ChatRequestSpeeds.Fast,
+                            "standard" => ChatRequestSpeeds.Standard,
+                            _ => null
+                        };
                     }
                     
                     break;
@@ -742,7 +767,9 @@ public class AnthropicEndpointProvider : BaseEndpointProvider, IEndpointProvider
                 }
             ],
             StreamInternalKind = ChatResultStreamInternalKinds.AppendAssistantMessage,
-            Usage = plaintextUsage
+            Usage = plaintextUsage,
+            ServiceTier = serviceTier,
+            Speed = speed
         };
         
         yield return new ChatResult
@@ -754,7 +781,9 @@ public class AnthropicEndpointProvider : BaseEndpointProvider, IEndpointProvider
                     FinishReason = finishReason
                 }
             ],
-            StreamInternalKind = ChatResultStreamInternalKinds.FinishData
+            StreamInternalKind = ChatResultStreamInternalKinds.FinishData,
+            ServiceTier = serviceTier,
+            Speed = speed
         };
     }
     
@@ -827,6 +856,12 @@ public class AnthropicEndpointProvider : BaseEndpointProvider, IEndpointProvider
             if (RequiresAdvancedToolUseHeader(sourceObject))
             {
                 betaHeaders.Add("advanced-tool-use-2025-11-20");
+            }
+            
+            // Add fast mode beta header if applicable
+            if (RequiresFastModeHeader(sourceObject))
+            {
+                betaHeaders.Add("fast-mode-2026-02-01");
             }
             
             req.Headers.Add("anthropic-beta", AccumulateHeaders(betaHeaders, sourceObject));

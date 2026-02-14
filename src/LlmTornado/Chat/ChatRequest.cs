@@ -101,6 +101,7 @@ public class ChatRequest : IModelRequest, ISerializableRequest, IHeaderProvider
 		ReasoningEffort = basedOn.ReasoningEffort;
 		Prediction = basedOn.Prediction;
 		ServiceTier = basedOn.ServiceTier;
+		Speed = basedOn.Speed;
 		Stream = basedOn.Stream;
 		ReasoningBudget = basedOn.ReasoningBudget;
 		Logprobs = basedOn.Logprobs;
@@ -239,9 +240,17 @@ public class ChatRequest : IModelRequest, ISerializableRequest, IHeaderProvider
 	
 	/// <summary>
 	///     Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the OpenAI scale tier service.
+	///     For Anthropic, controls Priority Tier usage with values <see cref="ChatRequestServiceTiers.Auto"/> (default) and <see cref="ChatRequestServiceTiers.StandardOnly"/>.
 	/// </summary>
 	[JsonProperty("service_tier")]
 	public ChatRequestServiceTiers? ServiceTier { get; set; }
+
+	/// <summary>
+	///     Controls the inference speed tier. Currently supported by Anthropic on Claude Opus 4.6.
+	///     Set to <see cref="ChatRequestSpeeds.Fast"/> for up to 2.5x faster output token generation at premium pricing.
+	/// </summary>
+	[JsonIgnore]
+	public ChatRequestSpeeds? Speed { get; set; }
 
 	/// <summary>
 	///     The response format to use. If <see cref="ChatRequestResponseFormats.Json" />, either system or user message in the
