@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -1948,9 +1948,11 @@ public class Conversation
 
                             if (eventsHandler.OnFinished is not null)
                             {
+                                ChatChoice? finishChoice = MostRecentApiResult?.Choices?.FirstOrDefault();
                                 await eventsHandler.OnFinished.Invoke(new ChatStreamFinishedData(
                                     res.Usage ?? new ChatUsage(provider.Provider), 
-                                    ChatMessageFinishReasons.ToolCalls));
+                                    finishChoice?.FinishReason ?? ChatMessageFinishReasons.ToolCalls,
+                                    finishChoice?.StopReason));
                             }
 
                             return;
