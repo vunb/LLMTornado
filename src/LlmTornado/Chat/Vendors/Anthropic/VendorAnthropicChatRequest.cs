@@ -841,9 +841,10 @@ internal class VendorAnthropicChatRequest
             return false;
         }
         
-        // Effort parameter is supported by Claude Opus 4.5+
+        // Effort parameter is supported by Claude Opus 4.5+, Opus 4.6, and Sonnet 4.6
         return modelName.StartsWith("claude-opus-4-5", StringComparison.OrdinalIgnoreCase)
-            || modelName.StartsWith("claude-opus-4-6", StringComparison.OrdinalIgnoreCase);
+            || modelName.StartsWith("claude-opus-4-6", StringComparison.OrdinalIgnoreCase)
+            || modelName.StartsWith("claude-sonnet-4-6", StringComparison.OrdinalIgnoreCase);
     }
     
     private static bool IsExtendedThinkingModel(string? modelName)
