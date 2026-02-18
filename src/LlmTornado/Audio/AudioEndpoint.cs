@@ -124,7 +124,7 @@ public class AudioEndpoint : EndpointBase
             }
         }
         
-        if (request.Include?.Count > 0 && AudioModelOpenAi.IncludeCompatibleModels.Contains(request.Model) && request.ResponseFormat is AudioTranscriptionResponseFormats.Json && request.Model != AudioModel.OpenAi.Gpt4.Gpt4OTranscribeDiarize)
+        if (request.Include?.Count > 0 && AudioModelOpenAi.IncludeCompatibleModels.Contains(request.Model ?? string.Empty) && request.ResponseFormat is AudioTranscriptionResponseFormats.Json && request.Model != AudioModel.OpenAi.Gpt4.Gpt4OTranscribeDiarize)
         {
             foreach (TranscriptionRequestIncludeItems item in request.Include)
             {
@@ -134,21 +134,26 @@ public class AudioEndpoint : EndpointBase
         
         if (request.ChunkingStrategy is not null)
         {
-             if (request.ChunkingStrategy.Type == TranscriptionChunkingStrategyType.Auto)
-             {
-                 serializedRequest.Content.Add(new StringContent("auto"), "chunking_strategy");
-             }
-             else if (request.ChunkingStrategy.Type == TranscriptionChunkingStrategyType.ServerVad)
-             {
-                 var strategy = new 
-                 {
-                     type = "server_vad",
-                     prefix_padding_ms = request.ChunkingStrategy.PrefixPaddingMs,
-                     silence_duration_ms = request.ChunkingStrategy.SilenceDurationMs,
-                     threshold = request.ChunkingStrategy.Threshold
-                 };
-                 serializedRequest.Content.Add(new StringContent(JsonConvert.SerializeObject(strategy, EndpointBase.NullSettings)), "chunking_strategy");
-             }
+            switch (request.ChunkingStrategy.Type)
+            {
+                case TranscriptionChunkingStrategyType.Auto:
+                {
+                    serializedRequest.Content.Add(new StringContent("auto"), "chunking_strategy");
+                    break;
+                }
+                case TranscriptionChunkingStrategyType.ServerVad:
+                {
+                    var strategy = new 
+                    {
+                        type = "server_vad",
+                        prefix_padding_ms = request.ChunkingStrategy.PrefixPaddingMs,
+                        silence_duration_ms = request.ChunkingStrategy.SilenceDurationMs,
+                        threshold = request.ChunkingStrategy.Threshold
+                    };
+                    serializedRequest.Content.Add(new StringContent(JsonConvert.SerializeObject(strategy, EndpointBase.NullSettings)), "chunking_strategy");
+                    break;
+                }
+            }
         }
 
         if (request.KnownSpeakerNames?.Count > 0)
@@ -174,16 +179,18 @@ public class AudioEndpoint : EndpointBase
             
             serializedRequest.Sc.Headers.ContentLength = request.File.Data.Length;
             serializedRequest.Sc.Headers.ContentType = new MediaTypeHeaderValue(request.File.GetContentType);
-        
-            serializedRequest.Content.Add(serializedRequest.Sc, "file", "test.wav");
+
+            string fileName = $"audio.{request.File.GetFileExtension}";
+            serializedRequest.Content.Add(serializedRequest.Sc, "file", fileName);
         }
         else if (request.File?.File is not null)
         {
             serializedRequest.Sc = new StreamContent(request.File.File);
             serializedRequest.Sc.Headers.ContentLength = request.File.File.Length;
             serializedRequest.Sc.Headers.ContentType = new MediaTypeHeaderValue(request.File.GetContentType);
-        
-            serializedRequest.Content.Add(serializedRequest.Sc, "file", "test.wav");
+
+            string fileName = $"audio.{request.File.GetFileExtension}";
+            serializedRequest.Content.Add(serializedRequest.Sc, "file", fileName);
         }
         
         // URL parameter for audio URL (Groq supports this as alternative to file)
@@ -192,7 +199,7 @@ public class AudioEndpoint : EndpointBase
             serializedRequest.Content.Add(new StringContent(request.Url), "url");
         }
         
-        serializedRequest.Content.Add(new StringContent(request.Model.GetApiName), "model");
+        serializedRequest.Content.Add(new StringContent(request.Model?.GetApiName), "model");
 
         if (!request.Prompt.IsNullOrWhiteSpace())
         {
