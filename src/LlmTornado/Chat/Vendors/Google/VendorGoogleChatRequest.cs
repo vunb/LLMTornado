@@ -1458,10 +1458,25 @@ internal class VendorGoogleChatRequest
             int? clamped = request.Model.ClampReasoningTokens(request.ReasoningBudget);
             string? thinkingLevel = null;
 
-            if (ChatModelGoogle.Gemini3Models.Contains(request.Model))
+            if (ChatModelGoogle.Gemini31Models.Contains(request.Model))
+            {
+                // Gemini 3.1 Pro supports: low, medium, high (not minimal)
+                thinkingLevel = request.ReasoningEffort switch
+                {
+                    ChatReasoningEfforts.Minimal => "low",
+                    ChatReasoningEfforts.Low => "low",
+                    ChatReasoningEfforts.Medium => "medium",
+                    ChatReasoningEfforts.High or ChatReasoningEfforts.XHigh => "high",
+                    ChatReasoningEfforts.Default => "high",
+                    _ => null
+                };
+            }
+            else if (ChatModelGoogle.Gemini3Models.Contains(request.Model))
             {
                 bool isFlash = request.Model == ChatModelGoogleGeminiPreview.ModelGemini3FlashPreview;
 
+                // Gemini 3 Flash supports: minimal, low, medium, high
+                // Gemini 3 Pro supports: low, high (not minimal, not medium)
                 thinkingLevel = request.ReasoningEffort switch
                 {
                     ChatReasoningEfforts.Minimal => isFlash ? "minimal" : "low",
