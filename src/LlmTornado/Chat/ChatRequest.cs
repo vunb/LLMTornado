@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.Serialization;
 using System.Threading;
 using LlmTornado.Chat.Models;
 using LlmTornado.ChatFunctions;
@@ -114,6 +115,7 @@ public class ChatRequest : IModelRequest, ISerializableRequest, IHeaderProvider
 		Verbosity = basedOn.Verbosity;
 		SafetyIdentifier = basedOn.SafetyIdentifier;
 		PromptCacheKey = basedOn.PromptCacheKey;
+		AutoCache = basedOn.AutoCache;
 		CancellationToken = basedOn.CancellationToken;
 		InvokeClrToolsAutomatically = basedOn.InvokeClrToolsAutomatically;
 	}
@@ -285,6 +287,13 @@ public class ChatRequest : IModelRequest, ISerializableRequest, IHeaderProvider
 	/// </summary>
 	[JsonProperty("prompt_cache_retention")]
 	public PromptCacheRetention? PromptCacheRetention { get; set; }
+
+	/// <summary>
+	/// Enables automatic prompt caching for Anthropic models. When set, the system automatically applies a cache breakpoint to the last cacheable block and moves it forward as conversations grow.
+	/// This maps to the top-level <c>cache_control</c> field in the Anthropic API. No effect on other providers.
+	/// </summary>
+	[JsonIgnore]
+	public ChatRequestCacheSettings? AutoCache { get; set; }
 	
 	/// <summary>
 	/// A stable identifier used to help detect users of your application that may be violating OpenAI's usage policies. The IDs should be a string that uniquely identifies each user. We recommend hashing their username or email address, in order to avoid sending us any identifying information. 
@@ -1299,5 +1308,54 @@ public class ChatRequest : IModelRequest, ISerializableRequest, IHeaderProvider
         {
             return existingValue;
         }
+    }
+}
+
+/// <summary>
+/// TTL options for automatic prompt caching. Currently only used by Anthropic.
+/// </summary>
+[JsonConverter(typeof(StringEnumConverter))]
+public enum ChatRequestCacheTtl
+{
+    /// <summary>
+    /// 5-minute cache (default). Cache is refreshed for free each time the cached content is used.
+    /// </summary>
+    [EnumMember(Value = "5m")]
+    FiveMinutes,
+    /// <summary>
+    /// 1-hour cache at 2x the base input token price.
+    /// </summary>
+    [EnumMember(Value = "1h")]
+    OneHour
+}
+
+/// <summary>
+/// Settings for automatic prompt caching. When set on <see cref="ChatRequest.AutoCache"/>, the provider automatically
+/// applies a cache breakpoint to the last cacheable block and moves it forward as conversations grow.
+/// Currently supported by Anthropic only.
+/// </summary>
+public class ChatRequestCacheSettings
+{
+    /// <summary>
+    /// Ephemeral cache with default 5-minute TTL.
+    /// </summary>
+    public static readonly ChatRequestCacheSettings Ephemeral = new ChatRequestCacheSettings();
+
+    /// <summary>
+    /// Ephemeral cache with the specified TTL.
+    /// </summary>
+    public static ChatRequestCacheSettings EphemeralWithTtl(ChatRequestCacheTtl ttl)
+    {
+        return new ChatRequestCacheSettings { Ttl = ttl };
+    }
+
+    /// <summary>
+    /// Time to live for the cache entry. Defaults to 5 minutes when null.
+    /// </summary>
+    [JsonIgnore]
+    public ChatRequestCacheTtl? Ttl { get; private set; }
+
+    private ChatRequestCacheSettings()
+    {
     }
 }

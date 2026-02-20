@@ -624,6 +624,9 @@ internal class VendorAnthropicChatRequest
     [JsonProperty("speed")]
     [JsonConverter(typeof(StringEnumConverter))]
     public ChatRequestSpeeds? Speed { get; set; }
+
+    [JsonProperty("cache_control")]
+    public AnthropicCacheSettings? CacheControl { get; set; }
     
     public VendorAnthropicChatRequest(ChatRequest request, IEndpointProvider provider)
     {
@@ -811,6 +814,15 @@ internal class VendorAnthropicChatRequest
         if (request.Speed is ChatRequestSpeeds.Fast)
         {
             Speed = ChatRequestSpeeds.Fast;
+        }
+
+        // Automatic caching: top-level cache_control causes the system to automatically apply a cache
+        // breakpoint to the last cacheable block and move it forward as conversations grow
+        if (request.AutoCache is not null)
+        {
+            CacheControl = request.AutoCache.Ttl.HasValue
+                ? AnthropicCacheSettings.EphemeralWithTtl(request.AutoCache.Ttl.Value)
+                : AnthropicCacheSettings.Ephemeral;
         }
         
         // Handle effort parameter using harmonized ReasoningEffort (Claude Opus 4.5+)
