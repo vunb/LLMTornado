@@ -79,7 +79,9 @@ public class ChatModelGoogle : BaseVendorModelProvider
         ChatModelGoogleGemini.ModelGemini25FlashLite,
         ChatModelGoogleGeminiPreview.ModelGemini25FlashLitePreview0617,
         ChatModelGoogleGeminiPreview.ModelGemini3ProPreview,
-        ChatModelGoogleGeminiPreview.ModelGemini3FlashPreview
+        ChatModelGoogleGeminiPreview.ModelGemini3FlashPreview,
+        ChatModelGoogleGeminiPreview.ModelGemini31ProPreview,
+        ChatModelGoogleGeminiPreview.ModelGemini31ProPreviewCustomtools
     ];
     
     /// <summary>
@@ -92,7 +94,9 @@ public class ChatModelGoogle : BaseVendorModelProvider
         ChatModelGoogleGeminiPreview.ModelGemini25FlashLitePreview0617,
         ChatModelGoogleGeminiPreview.ModelGemini3ProPreview,
         ChatModelGoogleGeminiPreview.ModelGemini3ProImagePreview,
-        ChatModelGoogleGeminiPreview.ModelGemini3FlashPreview
+        ChatModelGoogleGeminiPreview.ModelGemini3FlashPreview,
+        ChatModelGoogleGeminiPreview.ModelGemini31ProPreview,
+        ChatModelGoogleGeminiPreview.ModelGemini31ProPreviewCustomtools
     ];
     
     /// <summary>
@@ -102,6 +106,14 @@ public class ChatModelGoogle : BaseVendorModelProvider
         ChatModelGoogleGeminiPreview.ModelGemini3ProPreview,
         ChatModelGoogleGeminiPreview.ModelGemini3ProImagePreview,
         ChatModelGoogleGeminiPreview.ModelGemini3FlashPreview
+    ];
+
+    /// <summary>
+    /// Models that support Gemini 3.1 features. These models are backwards-compatible with <see cref="Gemini3Models"/> features.
+    /// </summary>
+    public static readonly HashSet<IModel> Gemini31Models = [
+        ChatModelGoogleGeminiPreview.ModelGemini31ProPreview,
+        ChatModelGoogleGeminiPreview.ModelGemini31ProPreviewCustomtools
     ];
     
     /// <summary>
@@ -117,14 +129,14 @@ public class ChatModelGoogle : BaseVendorModelProvider
     /// </summary>
     public static List<IModel> ComputerUseModels => LazyComputerUseModels.Value;
 
-    private static readonly Lazy<List<IModel>> LazyComputerUseModels = new Lazy<List<IModel>>(() => [ChatModelGoogleGeminiPreview.ModelGemini25ComputerUsePreview102025, ChatModelGoogleGeminiPreview.ModelGemini3ProPreview, ChatModelGoogleGeminiPreview.ModelGemini3FlashPreview]);
+    private static readonly Lazy<List<IModel>> LazyComputerUseModels = new Lazy<List<IModel>>(() => [ChatModelGoogleGeminiPreview.ModelGemini25ComputerUsePreview102025, ChatModelGoogleGeminiPreview.ModelGemini3ProPreview, ChatModelGoogleGeminiPreview.ModelGemini3FlashPreview, ChatModelGoogleGeminiPreview.ModelGemini31ProPreview, ChatModelGoogleGeminiPreview.ModelGemini31ProPreviewCustomtools]);
     
     /// <summary>
     /// Models capable of reasoning.
     /// </summary>
     public static List<IModel>? ReasoningModelsList => LazyReasoningModels.Value;
 
-    private static readonly Lazy<List<IModel>> LazyReasoningModels = new Lazy<List<IModel>>(() => [ChatModelGoogleGeminiPreview.ModelGemini25FlashPreview0417, ChatModelGoogleGeminiPreview.ModelGemini25ProPreview0325, ChatModelGoogleGeminiPreview.ModelGemini25FlashPreview0520, ChatModelGoogleGeminiPreview.ModelGemini25ProPreview0506, ChatModelGoogleGeminiPreview.ModelGemini25ProPreview0605, ChatModelGoogleGemini.ModelGemini25Pro, ChatModelGoogleGemini.ModelGemini25Flash, ChatModelGoogleGeminiPreview.ModelGemini25FlashLitePreview0617]);
+    private static readonly Lazy<List<IModel>> LazyReasoningModels = new Lazy<List<IModel>>(() => [ChatModelGoogleGeminiPreview.ModelGemini25FlashPreview0417, ChatModelGoogleGeminiPreview.ModelGemini25ProPreview0325, ChatModelGoogleGeminiPreview.ModelGemini25FlashPreview0520, ChatModelGoogleGeminiPreview.ModelGemini25ProPreview0506, ChatModelGoogleGeminiPreview.ModelGemini25ProPreview0605, ChatModelGoogleGemini.ModelGemini25Pro, ChatModelGoogleGemini.ModelGemini25Flash, ChatModelGoogleGeminiPreview.ModelGemini25FlashLitePreview0617, ChatModelGoogleGeminiPreview.ModelGemini31ProPreview, ChatModelGoogleGeminiPreview.ModelGemini31ProPreviewCustomtools]);
 
     /// <summary>
     /// Models capable of generating images.

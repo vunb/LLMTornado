@@ -30,6 +30,30 @@ public class ChatModelGoogleGeminiPreview : IVendorModelClassProvider
     /// <inheritdoc cref="ModelGemini3ProPreview"/>
     /// </summary>
     public readonly ChatModel Gemini3ProPreview = ModelGemini3ProPreview;
+
+    /// <summary>
+    /// Gemini 3.1 Pro Preview is the next iteration of performance, behavior, and intelligence improvements in the 3 Pro family.
+    /// Features better thinking, improved token efficiency, and a more grounded, factually consistent experience.
+    /// Optimized for software engineering behavior, agentic workflows, precise tool usage, and reliable multi-step execution.
+    /// Input: Text, Image, Video, Audio, PDF. Output: Text. Context: 1M in / 64k out.
+    /// </summary>
+    public static readonly ChatModel ModelGemini31ProPreview = new ChatModel("gemini-3.1-pro-preview", LLmProviders.Google, 1_048_576);
+
+    /// <summary>
+    /// <inheritdoc cref="ModelGemini31ProPreview"/>
+    /// </summary>
+    public readonly ChatModel Gemini31ProPreview = ModelGemini31ProPreview;
+
+    /// <summary>
+    /// Variant of <see cref="ModelGemini31ProPreview"/> optimized for agentic workflows that prioritize custom tools over built-in bash commands.
+    /// Use this endpoint when the standard model ignores your custom tools in favor of bash.
+    /// </summary>
+    public static readonly ChatModel ModelGemini31ProPreviewCustomtools = new ChatModel("gemini-3.1-pro-preview-customtools", LLmProviders.Google, 1_048_576);
+
+    /// <summary>
+    /// <inheritdoc cref="ModelGemini31ProPreviewCustomtools"/>
+    /// </summary>
+    public readonly ChatModel Gemini31ProPreviewCustomtools = ModelGemini31ProPreviewCustomtools;
     
     /// <summary>
     /// Gemini 3 Pro Image Preview is a state-of-the-art image generation and editing model optimized for professional asset production.
@@ -197,6 +221,7 @@ public class ChatModelGoogleGeminiPreview : IVendorModelClassProvider
 
     private static readonly Lazy<List<IModel>> LazyModelsAll = new Lazy<List<IModel>>(() => [
         ModelGemini3FlashPreview, ModelGemini3ProPreview, ModelGemini3ProImagePreview,
+        ModelGemini31ProPreview, ModelGemini31ProPreviewCustomtools,
         ModelGemini25ComputerUsePreview102025, ModelGemini25ProPreview0325, ModelGemini25ProPreview0506, ModelGemini25ProPreview0605, ModelGemini25FlashPreview0417,
         ModelGemini25FlashPreview0520, ModelGemini2FlashPreviewImageGeneration, ModelGemini25FlashPreviewTts, ModelGemini25ProPreviewTts,
         ModelGemini25FlashLitePreview0617, ModelGemini25FlashImagePreview, ModelGemini25FlashPreview0925, ModelGemini25FlashLitePreview0925,
