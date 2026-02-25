@@ -45,6 +45,11 @@ public class ChatModelOpenAi : BaseVendorModelProvider
     public readonly ChatModelOpenAiGpt52 Gpt52 = new ChatModelOpenAiGpt52();
     
     /// <summary>
+    /// GPT-5.3 models.
+    /// </summary>
+    public readonly ChatModelOpenAiGpt53 Gpt53 = new ChatModelOpenAiGpt53();
+    
+    /// <summary>
     /// O3 models.
     /// </summary>
     public readonly ChatModelOpenAiO3 O3 = new ChatModelOpenAiO3();
@@ -93,14 +98,14 @@ public class ChatModelOpenAi : BaseVendorModelProvider
     /// </summary>
     public static List<IModel> ModelsAll => LazyModelsAll.Value;
 
-    private static readonly Lazy<List<IModel>> LazyModelsAll = new Lazy<List<IModel>>(() => [..ChatModelOpenAiGpt35.ModelsAll, ..ChatModelOpenAiGpt4.ModelsAll, ..ChatModelOpenAiO3.ModelsAll, ..ChatModelOpenAiO4.ModelsAll, ..ChatModelOpenAiGpt41.ModelsAll, ..ChatModelOpenAiGpt5.ModelsAll, ..ChatModelOpenAiGpt51.ModelsAll, ..ChatModelOpenAiGpt52.ModelsAll, ..ChatModelOpenAiCodex.ModelsAll]);
+    private static readonly Lazy<List<IModel>> LazyModelsAll = new Lazy<List<IModel>>(() => [..ChatModelOpenAiGpt35.ModelsAll, ..ChatModelOpenAiGpt4.ModelsAll, ..ChatModelOpenAiO3.ModelsAll, ..ChatModelOpenAiO4.ModelsAll, ..ChatModelOpenAiGpt41.ModelsAll, ..ChatModelOpenAiGpt5.ModelsAll, ..ChatModelOpenAiGpt51.ModelsAll, ..ChatModelOpenAiGpt52.ModelsAll, ..ChatModelOpenAiGpt53.ModelsAll, ..ChatModelOpenAiCodex.ModelsAll]);
 
     /// <summary>
     /// All reasoning models. Requests for these models are serialized differently.
     /// </summary>
     public static List<IModel> ReasoningModelsAll => LazyReasoningModelsAll.Value;
 
-    private static readonly Lazy<List<IModel>> LazyReasoningModelsAll = new Lazy<List<IModel>>(() => [..ChatModelOpenAiGpt4.ReasoningModels, ..ChatModelOpenAiO3.ModelsAll, ..ChatModelOpenAiO4.ModelsAll, ..ChatModelOpenAiGpt5.ModelsAll, ..ChatModelOpenAiGpt51.ModelsAll, ..ChatModelOpenAiGpt52.ModelsAll]);
+    private static readonly Lazy<List<IModel>> LazyReasoningModelsAll = new Lazy<List<IModel>>(() => [..ChatModelOpenAiGpt4.ReasoningModels, ..ChatModelOpenAiO3.ModelsAll, ..ChatModelOpenAiO4.ModelsAll, ..ChatModelOpenAiGpt5.ModelsAll, ..ChatModelOpenAiGpt51.ModelsAll, ..ChatModelOpenAiGpt52.ModelsAll, ..ChatModelOpenAiGpt53.ModelsAll]);
     
     /// <summary>
     /// HashSet version of ReasoningModelsAll.
@@ -114,7 +119,7 @@ public class ChatModelOpenAi : BaseVendorModelProvider
     /// </summary>
     public static List<IModel> WebSearchCompatibleModelsAll => LazyWebSearchCompatibleModelsAll.Value;
 
-    private static readonly Lazy<List<IModel>> LazyWebSearchCompatibleModelsAll = new Lazy<List<IModel>>(() => [ChatModelOpenAiGpt4.ModelOSearchPreview, ChatModelOpenAiGpt4.ModelOMiniSearchPreview, ..ChatModelOpenAiGpt5.ModelsAll, ..ChatModelOpenAiGpt51.ModelsAll, ..ChatModelOpenAiGpt52.ModelsAll]);
+    private static readonly Lazy<List<IModel>> LazyWebSearchCompatibleModelsAll = new Lazy<List<IModel>>(() => [ChatModelOpenAiGpt4.ModelOSearchPreview, ChatModelOpenAiGpt4.ModelOMiniSearchPreview, ..ChatModelOpenAiGpt5.ModelsAll, ..ChatModelOpenAiGpt51.ModelsAll, ..ChatModelOpenAiGpt52.ModelsAll, ..ChatModelOpenAiGpt53.ModelsAll]);
 
     internal static HashSet<IModel> TempIncompatibleModels => LazyTempIncompatibleModels.Value;
 
@@ -137,7 +142,7 @@ public class ChatModelOpenAi : BaseVendorModelProvider
     internal static HashSet<IModel> SamplingParamsConditionallySupported => LazySamplingParamsConditionallySupported.Value;
     
     private static readonly Lazy<HashSet<IModel>> LazySamplingParamsConditionallySupported = new Lazy<HashSet<IModel>>(() => [
-        ..ChatModelOpenAiGpt51.ModelsAll, ..ChatModelOpenAiGpt52.ModelsAll
+        ..ChatModelOpenAiGpt51.ModelsAll, ..ChatModelOpenAiGpt52.ModelsAll, ..ChatModelOpenAiGpt53.ModelsAll
     ]);
     
     /// <summary>
@@ -175,7 +180,7 @@ public class ChatModelOpenAi : BaseVendorModelProvider
     public static List<IModel> AudioModelsAll => LazyAudioModelsAll.Value;
 
     private static readonly Lazy<List<IModel>> LazyAudioModelsAll = new Lazy<List<IModel>>(() => [
-        ChatModelOpenAiGpt5.ModelAudio, ChatModelOpenAiGpt5.ModelAudioMini, ChatModelOpenAiGpt4.ModelAudioPreview, ChatModelOpenAiGpt4.ModelAudioPreview241001, ChatModelOpenAiGpt4.ModelAudioPreview241217,
+        ChatModelOpenAiGpt5.ModelAudio, ChatModelOpenAiGpt5.ModelAudioMini, ChatModelOpenAiGpt5.ModelAudio15, ChatModelOpenAiGpt4.ModelAudioPreview, ChatModelOpenAiGpt4.ModelAudioPreview241001, ChatModelOpenAiGpt4.ModelAudioPreview241217,
         ChatModelOpenAiGpt4.ModelAudioPreview250603
     ]);
     
