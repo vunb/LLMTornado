@@ -14,11 +14,14 @@
         <Description>Connect agents to data sources, tools, and workflows via Model Context Protocol (MCP).</Description>
         <PackageTags>mcp;sdk;agent;workflow;orchestration;multi-agent;agents;rag</PackageTags>
     </PropertyGroup>
+    <PropertyGroup>
+        <DefineConstants Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">$(DefineConstants);MODERN</DefineConstants>
+    </PropertyGroup>
     <ItemGroup>
       <ProjectReference Include="..\LlmTornado\LlmTornado.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="ModelContextProtocol" Version="[0.7.0-preview.1, )" />
+      <PackageReference Include="ModelContextProtocol" Version="[1.0.0, )" />
     </ItemGroup>
 
     <ItemGroup>
