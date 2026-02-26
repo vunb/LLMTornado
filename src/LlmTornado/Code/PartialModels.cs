@@ -647,6 +647,12 @@ public enum ChatRequestServiceTiers
     /// </summary>
     [EnumMember(Value = "flex")]
     Flex,
+    
+    /// <summary>
+    /// Scale tier processing with higher rate limits and guaranteed latency SLA.
+    /// </summary>
+    [EnumMember(Value = "scale")]
+    Scale,
 
     /// <summary>
     /// Additional option for service_tier supported by Groq
@@ -751,6 +757,12 @@ public enum ChatReasoningFormats
 [JsonConverter(typeof(StringEnumConverter))]
 public enum PromptCacheRetention
 {
+    /// <summary>
+    /// In-memory cache retention.
+    /// </summary>
+    [EnumMember(Value = "in-memory")]
+    InMemory,
+    
     /// <summary>
     /// 24-hour cache retention. Keeps cached prefixes active for up to 24 hours.
     /// </summary>

@@ -27,6 +27,16 @@ public class ResponseRequest
     public bool? Background { get; set; }
 
     /// <summary>
+    /// The conversation that this response belongs to. Items from this conversation are prepended
+    /// to <c>input</c> for this response request. Input items and output items from this response
+    /// are automatically added to this conversation after this response completes.
+    /// Can be a plain conversation ID string or an object with an <c>id</c> field.
+    /// Cannot be used in conjunction with <see cref="PreviousResponseId"/>.
+    /// </summary>
+    [JsonProperty("conversation")]
+    public IResponseConversation? Conversation { get; set; }
+
+    /// <summary>
     /// Specify additional output data to include in the model response. 
     /// See <see cref="ResponseIncludeFields"/> for supported values.
     /// </summary>
@@ -136,6 +146,12 @@ public class ResponseRequest
     /// </summary>
     [JsonProperty("stream")]
     public bool? Stream { get; set; }
+    
+    /// <summary>
+    /// Options for streaming responses. Only set this when <see cref="Stream"/> is <c>true</c>.
+    /// </summary>
+    [JsonProperty("stream_options")]
+    public ResponseStreamOptions? StreamOptions { get; set; }
     
     /// <summary>
     /// What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. We generally recommend altering this or top_p but not both.
