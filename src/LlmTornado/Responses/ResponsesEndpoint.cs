@@ -285,6 +285,35 @@ public class ResponsesEndpoint : EndpointBase
     }
     
     /// <summary>
+    /// Returns the number of input tokens a response request would consume, without actually generating a response.
+    /// </summary>
+    /// <param name="request">The request to count tokens for.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    public async Task<ResponseInputTokensResult> CountInputTokens(ResponseRequest request, CancellationToken cancellationToken = default)
+    {
+        HttpCallResult<ResponseInputTokensResult> data = await CountInputTokensSafe(request, cancellationToken).ConfigureAwait(false);
+
+        if (!data.Ok)
+        {
+            throw data.Exception;
+        }
+
+        return data.Data;
+    }
+
+    /// <summary>
+    /// Returns the number of input tokens a response request would consume, without actually generating a response.
+    /// </summary>
+    /// <param name="request">The request to count tokens for.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    public async Task<HttpCallResult<ResponseInputTokensResult>> CountInputTokensSafe(ResponseRequest request, CancellationToken cancellationToken = default)
+    {
+        IEndpointProvider provider = Api.GetProvider(request.Model ?? ChatModel.OpenAi.Gpt35.Turbo);
+        TornadoRequestContent requestBody = request.Serialize(provider);
+        return await HttpPost<ResponseInputTokensResult>(provider, Endpoint, url: GetUrl(provider, "/input_tokens"), postData: requestBody.Body, model: request.Model, ct: cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Creates a responses API request.
     /// </summary>
     /// <param name="request">The request</param>

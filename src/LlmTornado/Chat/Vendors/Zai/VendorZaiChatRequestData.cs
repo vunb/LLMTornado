@@ -82,14 +82,14 @@ internal class VendorZaiChatRequestData : ChatRequest
         // Add built-in tools from vendor extensions
         if (request.VendorExtensions?.Zai?.BuiltInTools is { Count: > 0 })
         {
-            Tools ??= new List<VendorZaiTool>();
+            Tools ??= [];
             Tools.AddRange(request.VendorExtensions.Zai.BuiltInTools.Select(ConvertBuiltInTool));
         }
     }
     
     private static List<VendorZaiTool> ConvertTools(List<Tool> tools)
     {
-        List<VendorZaiTool> zaiTools = new();
+        List<VendorZaiTool> zaiTools = [];
         
         foreach (Tool tool in tools)
         {
