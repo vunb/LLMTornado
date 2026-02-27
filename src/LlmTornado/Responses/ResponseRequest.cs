@@ -290,4 +290,53 @@ public class ResponseRequest
     public ResponseRequest()
     {
     }
+
+    /// <summary>
+    /// Creates a shallow copy of the given request, optionally stripping generation-only fields.
+    /// </summary>
+    internal ResponseRequest(ResponseRequest basedOn, bool forTokenization = false)
+    {
+        Background = basedOn.Background;
+        Conversation = basedOn.Conversation;
+        Include = basedOn.Include;
+        InputString = basedOn.InputString;
+        InputItems = basedOn.InputItems;
+        Instructions = basedOn.Instructions;
+        MaxOutputTokens = basedOn.MaxOutputTokens;
+        MaxToolCalls = basedOn.MaxToolCalls;
+        Metadata = basedOn.Metadata;
+        Model = basedOn.Model;
+        ParallelToolCalls = basedOn.ParallelToolCalls;
+        PreviousResponseId = basedOn.PreviousResponseId;
+        Prompt = basedOn.Prompt;
+        Reasoning = basedOn.Reasoning;
+        ServiceTier = basedOn.ServiceTier;
+        Store = basedOn.Store;
+        Temperature = basedOn.Temperature;
+        Text = basedOn.Text;
+        ToolChoice = basedOn.ToolChoice;
+        Tools = basedOn.Tools;
+        TopLogprobs = basedOn.TopLogprobs;
+        TopP = basedOn.TopP;
+        Truncation = basedOn.Truncation;
+        PromptCacheKey = basedOn.PromptCacheKey;
+        PromptCacheRetention = basedOn.PromptCacheRetention;
+        SafetyIdentifier = basedOn.SafetyIdentifier;
+        User = basedOn.User;
+        Verbosity = basedOn.Verbosity;
+        ContextManagement = basedOn.ContextManagement;
+
+        if (forTokenization)
+        {
+            Stream = null;
+            StreamOptions = null;
+            Store = null;
+            Background = null;
+        }
+        else
+        {
+            Stream = basedOn.Stream;
+            StreamOptions = basedOn.StreamOptions;
+        }
+    }
 }

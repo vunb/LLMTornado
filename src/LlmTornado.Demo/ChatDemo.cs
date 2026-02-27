@@ -960,6 +960,71 @@ public partial class ChatDemo : DemoBase
     }
     
     [TornadoTest]
+    public static async Task AudioInGptAudioMp3()
+    {
+        Conversation chat = Program.Connect().Chat.CreateConversation(new ChatRequest
+        {
+            Model = ChatModel.OpenAi.Gpt5.Audio,
+            Modalities = [ ChatModelModalities.Text ],
+            MaxTokens = 2000
+        });
+
+        byte[] audioData = await File.ReadAllBytesAsync("Static/Audio/sample.mp3");
+        
+        chat.AppendUserInput([
+            new ChatMessagePart("What is being said in this audio?"),
+            new ChatMessagePart(audioData, ChatAudioFormats.Mp3)
+        ]);
+        
+        string? str = await chat.GetResponse();
+        Console.WriteLine(str);
+    }
+    
+    [TornadoTest]
+    public static async Task AudioInGptAudioWav()
+    {
+        Conversation chat = Program.Connect().Chat.CreateConversation(new ChatRequest
+        {
+            Model = ChatModel.OpenAi.Gpt5.Audio,
+            Modalities = [ ChatModelModalities.Text ],
+            MaxTokens = 2000
+        });
+
+        byte[] audioData = await File.ReadAllBytesAsync("Static/Audio/sample.wav");
+        
+        chat.AppendUserInput([
+            new ChatMessagePart(audioData, ChatAudioFormats.Wav)
+        ]);
+        
+        string? str = await chat.GetResponse();
+        Console.WriteLine(str);
+    }
+    
+    [TornadoTest]
+    public static async Task AudioInGptAudioDirect()
+    {
+        TornadoApi api = Program.Connect();
+        
+        byte[] audioData = await File.ReadAllBytesAsync("Static/Audio/sample.mp3");
+        
+        List<ChatMessagePart> parts =
+        [
+            new ChatMessagePart("What is being said in this audio?"),
+            new ChatMessagePart(audioData, ChatAudioFormats.Mp3)
+        ];
+
+        ChatResult? result = await api.Chat.CreateChatCompletion(new ChatRequest
+        {
+            Model = ChatModel.OpenAi.Gpt5.Audio,
+            Modalities = [ ChatModelModalities.Text ],
+            MaxTokens = 2000,
+            Messages = [new ChatMessage(ChatMessageRoles.User, parts)]
+        });
+        
+        Console.WriteLine(result?.Choices?.FirstOrDefault()?.Message?.Content);
+    }
+    
+    [TornadoTest]
     public static async Task AudioInAudioOutMultiturn()
     {
         Conversation chat = Program.Connect().Chat.CreateConversation(new ChatRequest

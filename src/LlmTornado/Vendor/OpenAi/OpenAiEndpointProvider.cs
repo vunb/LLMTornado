@@ -201,6 +201,7 @@ public class OpenAiEndpointProvider : BaseEndpointProvider, IEndpointProvider, I
     {
         return Provider switch
         {
+            LLmProviders.OpenAi when typeof(T) == typeof(Tokenize.TokenizeResult) => (T?)(object?)Tokenize.TokenizeResult.Deserialize(LLmProviders.OpenAi, jsonData, postData),
             LLmProviders.OpenAi => JsonConvert.DeserializeObject<T>(jsonData),
             LLmProviders.XAi => InboundMessageVariantProviderXAi<T>(jsonData, postData),
             LLmProviders.Cohere => InboundMessageVariantProviderCohere<T>(jsonData, postData),

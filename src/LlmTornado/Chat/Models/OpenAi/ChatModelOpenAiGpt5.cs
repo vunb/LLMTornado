@@ -132,7 +132,7 @@ public class ChatModelOpenAiGpt5 : IVendorModelClassProvider
     public static List<IModel> ModelsAll => LazyModelsAll.Value;
 
     private static readonly Lazy<List<IModel>> LazyModelsAll = new Lazy<List<IModel>>(() => [
-        ModelV5, ModelV5Mini, ModelV5Nano, ModelV5Codex, ModelV5Pro, ModelAudioMini, ModelAudio15, ModelRealtimeMini
+        ModelV5, ModelV5Mini, ModelV5Nano, ModelV5Codex, ModelV5Pro, ModelAudio, ModelAudioMini, ModelAudio15, ModelRealtimeMini
     ]);
     
     /// <summary>
