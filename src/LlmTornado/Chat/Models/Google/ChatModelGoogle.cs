@@ -96,7 +96,8 @@ public class ChatModelGoogle : BaseVendorModelProvider
         ChatModelGoogleGeminiPreview.ModelGemini3ProImagePreview,
         ChatModelGoogleGeminiPreview.ModelGemini3FlashPreview,
         ChatModelGoogleGeminiPreview.ModelGemini31ProPreview,
-        ChatModelGoogleGeminiPreview.ModelGemini31ProPreviewCustomtools
+        ChatModelGoogleGeminiPreview.ModelGemini31ProPreviewCustomtools,
+        ChatModelGoogleGeminiPreview.ModelGemini31FlashImagePreview
     ];
     
     /// <summary>
@@ -113,7 +114,8 @@ public class ChatModelGoogle : BaseVendorModelProvider
     /// </summary>
     public static readonly HashSet<IModel> Gemini31Models = [
         ChatModelGoogleGeminiPreview.ModelGemini31ProPreview,
-        ChatModelGoogleGeminiPreview.ModelGemini31ProPreviewCustomtools
+        ChatModelGoogleGeminiPreview.ModelGemini31ProPreviewCustomtools,
+        ChatModelGoogleGeminiPreview.ModelGemini31FlashImagePreview
     ];
     
     /// <summary>
@@ -143,7 +145,7 @@ public class ChatModelGoogle : BaseVendorModelProvider
     /// </summary>
     public static List<IModel> ImageModalitySupportingModelsList => LazyImageModalitySupportingModels.Value;
 
-    private static readonly Lazy<List<IModel>> LazyImageModalitySupportingModels = new Lazy<List<IModel>>(() => [ChatModelGoogleGeminiExperimental.ModelGemini2FlashImageGeneration, ChatModelGoogleGeminiPreview.ModelGemini2FlashPreviewImageGeneration, ChatModelGoogleGeminiPreview.ModelGemini25FlashImagePreview, ChatModelGoogleGeminiPreview.ModelGemini3ProImagePreview]);
+    private static readonly Lazy<List<IModel>> LazyImageModalitySupportingModels = new Lazy<List<IModel>>(() => [ChatModelGoogleGeminiExperimental.ModelGemini2FlashImageGeneration, ChatModelGoogleGeminiPreview.ModelGemini2FlashPreviewImageGeneration, ChatModelGoogleGeminiPreview.ModelGemini25FlashImagePreview, ChatModelGoogleGeminiPreview.ModelGemini3ProImagePreview, ChatModelGoogleGeminiPreview.ModelGemini31FlashImagePreview]);
 
     /// <summary>
     /// Models listed don't support system prompt.

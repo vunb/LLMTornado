@@ -336,11 +336,18 @@ internal class ChatMessageFinishReasonsConverter : JsonConverter<ChatMessageFini
         { "spii", ChatMessageFinishReasons.SensitivePersonalInformation },
         { "malformed_function_call", ChatMessageFinishReasons.MalformedToolCall },
         { "image_safety", ChatMessageFinishReasons.ImageSafety },
+        { "image_prohibited_content", ChatMessageFinishReasons.ImageProhibitedContent },
+        { "image_other", ChatMessageFinishReasons.ImageOther },
+        { "no_image", ChatMessageFinishReasons.NoImage },
+        { "image_recitation", ChatMessageFinishReasons.ImageRecitation },
         { "error", ChatMessageFinishReasons.Error },
+        { "other", ChatMessageFinishReasons.Error },
 
         { "tool_use", ChatMessageFinishReasons.ToolCalls },
         { "tool_calls", ChatMessageFinishReasons.ToolCalls },
         { "function_call", ChatMessageFinishReasons.ToolCalls },
+        { "unexpected_tool_call", ChatMessageFinishReasons.UnexpectedToolCall },
+        { "too_many_tool_calls", ChatMessageFinishReasons.TooManyToolCalls },
         
         { "model_context_window_exceeded", ChatMessageFinishReasons.ContextWindowExceeded },
         
@@ -444,6 +451,36 @@ public enum ChatMessageFinishReasons
     /// Token generation stopped because generated images contain safety violations.
     /// </summary>
     ImageSafety,
+    
+    /// <summary>
+    /// Image generation stopped because generated images contain prohibited content.
+    /// </summary>
+    ImageProhibitedContent,
+    
+    /// <summary>
+    /// Image generation stopped due to a miscellaneous issue.
+    /// </summary>
+    ImageOther,
+    
+    /// <summary>
+    /// The model was expected to generate an image but none was produced.
+    /// </summary>
+    NoImage,
+    
+    /// <summary>
+    /// Image generation stopped due to recitation.
+    /// </summary>
+    ImageRecitation,
+    
+    /// <summary>
+    /// The model generated a tool call but no tools were enabled in the request.
+    /// </summary>
+    UnexpectedToolCall,
+    
+    /// <summary>
+    /// The model called too many tools consecutively, causing the system to exit execution.
+    /// </summary>
+    TooManyToolCalls,
     
     /// <summary>
     /// The request was canceled/aborted.
@@ -1237,6 +1274,11 @@ public enum ChatImageAspectRatios
 [JsonConverter(typeof(StringEnumConverter))]
 public enum ChatImageResolutions
 {
+    /// <summary>
+    ///     512px resolution (smallest, lowest cost per image).
+    /// </summary>
+    [EnumMember(Value = "512")]
+    Resolution512,
     /// <summary>
     ///     1K resolution (default for most models).
     /// </summary>

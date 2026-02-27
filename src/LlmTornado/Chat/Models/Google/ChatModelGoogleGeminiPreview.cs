@@ -68,6 +68,18 @@ public class ChatModelGoogleGeminiPreview : IVendorModelClassProvider
     public readonly ChatModel Gemini3ProImagePreview = ModelGemini3ProImagePreview;
     
     /// <summary>
+    /// Gemini 3.1 Flash Image Preview delivers high-quality, photorealistic imagery at Flash speed.
+    /// Features subject consistency (up to 5 characters), object fidelity (up to 14 objects),
+    /// precise instruction following, and production-ready output from 512px to 4K.
+    /// </summary>
+    public static readonly ChatModel ModelGemini31FlashImagePreview = new ChatModel("gemini-3.1-flash-image-preview", LLmProviders.Google, 1_048_576);
+    
+    /// <summary>
+    /// <inheritdoc cref="ModelGemini31FlashImagePreview"/>
+    /// </summary>
+    public readonly ChatModel Gemini31FlashImagePreview = ModelGemini31FlashImagePreview;
+    
+    /// <summary>
     /// Gemini 2.5 Computer Use Preview model enables building browser control agents that interact with and automate tasks using screenshots and UI actions like mouse clicks and keyboard inputs.
     /// </summary>
     public static readonly ChatModel ModelGemini25ComputerUsePreview102025 = new ChatModel("gemini-2.5-computer-use-preview-10-2025", LLmProviders.Google, 1_048_576);
@@ -220,7 +232,7 @@ public class ChatModelGoogleGeminiPreview : IVendorModelClassProvider
     public static List<IModel> ModelsAll => LazyModelsAll.Value;
 
     private static readonly Lazy<List<IModel>> LazyModelsAll = new Lazy<List<IModel>>(() => [
-        ModelGemini3FlashPreview, ModelGemini3ProPreview, ModelGemini3ProImagePreview,
+        ModelGemini3FlashPreview, ModelGemini3ProPreview, ModelGemini3ProImagePreview, ModelGemini31FlashImagePreview,
         ModelGemini31ProPreview, ModelGemini31ProPreviewCustomtools,
         ModelGemini25ComputerUsePreview102025, ModelGemini25ProPreview0325, ModelGemini25ProPreview0506, ModelGemini25ProPreview0605, ModelGemini25FlashPreview0417,
         ModelGemini25FlashPreview0520, ModelGemini2FlashPreviewImageGeneration, ModelGemini25FlashPreviewTts, ModelGemini25ProPreviewTts,

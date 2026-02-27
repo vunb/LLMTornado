@@ -82,6 +82,12 @@ internal class VendorGoogleChatRequestGenerationConfig
     public int? TopK { get; set; }
     
     /// <summary>
+    /// Optional. Seed used in decoding. If not set, the request uses a randomly generated seed.
+    /// </summary>
+    [JsonProperty("seed")]
+    public int? Seed { get; set; }
+    
+    /// <summary>
     /// Optional. Presence penalty applied to the next token's logprobs if the token has already been seen in the response. This penalty is binary on/off and not dependant on the number of times the token is used (after the first). Use frequencyPenalty for a penalty that increases with each use. A positive penalty will discourage the use of tokens that have already been used in the response, increasing the vocabulary.
     /// </summary>
     [JsonProperty("presencePenalty")]
@@ -1449,7 +1455,10 @@ internal class VendorGoogleChatRequest
             MaxOutputTokens = request.MaxTokens,
             StopSequences = request.MultipleStopSequences is not null ? request.MultipleStopSequences.Take(5).ToList() : request.StopSequence is not null ? [ request.StopSequence ] : null,
             ResponseLogprobs = request.Logprobs,
-            Logprobs = request.TopLogprobs
+            Logprobs = request.TopLogprobs,
+            Seed = request.Seed,
+            PresencePenalty = request.PresencePenalty,
+            FrequencyPenalty = request.FrequencyPenalty
         };
 
         // thinkingConfig is not supported for non-thinking models
@@ -1542,6 +1551,7 @@ internal class VendorGoogleChatRequest
                     {
                         GenerationConfig.ImageConfig.ImageSize = request.ImageOutput.Resolution switch
                         {
+                            ChatImageResolutions.Resolution512 => "512",
                             ChatImageResolutions.Resolution1K => "1K",
                             ChatImageResolutions.Resolution2K => "2K",
                             ChatImageResolutions.Resolution4K => "4K",
