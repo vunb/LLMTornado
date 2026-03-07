@@ -844,7 +844,7 @@ public enum ChatReasoningEfforts
     High,
     
     /// <summary>
-    ///     Extra high reasoning. Available for GPT-5.2 and GPT-5.1-Codex-Max.
+    ///     Extra high reasoning. Available for GPT-5.2, GPT-5.4, and GPT-5.1-Codex-Max.
     /// </summary>
     [EnumMember(Value = "xhigh")]
     XHigh,

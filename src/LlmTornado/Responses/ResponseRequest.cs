@@ -246,7 +246,7 @@ public class ResponseRequest
     /// </summary>
     public TornadoRequestContent Serialize(IEndpointProvider provider, ResponseRequestSerializeOptions? options = null)
     {
-        // GPT-5.2 parameter compatibility
+        // GPT-5.2 and GPT-5.4 parameter compatibility
         if (provider.Provider is LLmProviders.OpenAi)
         {
             bool hasNonNoneReasoning = Reasoning?.Effort is not null && Reasoning.Effort != ResponseReasoningEfforts.None;

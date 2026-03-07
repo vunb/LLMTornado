@@ -568,7 +568,7 @@ public class ChatRequest : IModelRequest, ISerializableRequest, IHeaderProvider
 						x.Temperature = null;
 					}
 					
-					// GPT-5.2 parameter compatibility
+					// GPT-5.2 and GPT-5.4 parameter compatibility
 					bool hasNonNoneReasoning = x.ReasoningEffort is not null && x.ReasoningEffort != ChatReasoningEfforts.None;
 					if (ChatModelOpenAi.ShouldClearSamplingParams(x.Model, hasNonNoneReasoning))
 					{
