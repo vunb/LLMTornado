@@ -797,7 +797,7 @@ public enum PromptCacheRetention
     /// <summary>
     /// In-memory cache retention.
     /// </summary>
-    [EnumMember(Value = "in-memory")]
+    [EnumMember(Value = "in_memory")]
     InMemory,
     
     /// <summary>
