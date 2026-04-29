@@ -105,7 +105,7 @@ public class TornadoRunner
         try
         {
             runnerOptions ??= new TornadoRunnerOptions();
-            Conversation conversation = SetupConversation(agent, input, messagesToAppend, responseId, cancellationToken);
+            Conversation conversation = SetupConversation(agent, input, messagesToAppend, responseId, runnerOptions, cancellationToken);
         
             // check if the input triggers a guardrail to stop the agent from continuing
             await CheckInputGuardrail(conversation, input, guardRail);
@@ -245,12 +245,19 @@ public class TornadoRunner
     /// <param name="responseId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private static Conversation SetupConversation(TornadoAgent agent, List<ChatMessagePart>? input = null, List<ChatMessage>? messages = null, string? responseId = null, CancellationToken cancellationToken = default)
+    private static Conversation SetupConversation(TornadoAgent agent, List<ChatMessagePart>? input = null, List<ChatMessage>? messages = null, string? responseId = null, TornadoRunnerOptions? runnerOptions = null, CancellationToken cancellationToken = default)
     {
         Conversation chat = agent.Client.Chat.CreateConversation(agent.Options);
 
         //Set the cancellation token for the agent client
         chat.RequestParameters.CancellationToken = cancellationToken;
+
+        bool sysMesageAtStart = runnerOptions?.SystemMessageAtStart ?? false; // Default false for system message at the end.
+
+        if (sysMesageAtStart)
+        {
+            chat.AddSystemMessage(agent.Instructions); //Set the instructions for the agent at the start of the conversation
+        }
 
         //Setup the messages from previous runs or memory
         chat = AddMessagesToConversation(chat, messages);
@@ -268,7 +275,10 @@ public class TornadoRunner
         }
 
         //Setting up system message at the end.
-        chat.AddSystemMessage(agent.Instructions); //Set the instructions for the agent
+        if (!sysMesageAtStart)
+        {
+            chat.AddSystemMessage(agent.Instructions); //Set the instructions for the agent
+        }
 
         return chat;
     }

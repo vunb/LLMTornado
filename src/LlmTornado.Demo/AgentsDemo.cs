@@ -76,6 +76,29 @@ public class AgentsDemo : DemoBase
         }
     }
 
+
+    [TornadoTest("BasicLocalAgent")]
+    [Flaky("manual interaction")]
+    public static async Task BasicLocalAgentChatBot()
+    {
+        TornadoApi api = new TornadoApi(new Uri("http://localhost:11434")); // default Ollama port, API key can be passed in the second argument if needed
+        TornadoAgent agent = new TornadoAgent(api, new ChatModel("qwen3:14b"), instructions: "You are a useful assistant.");  // <-- replace with your model
+
+        Conversation conv = agent.Client.Chat.CreateConversation(agent.Options);
+
+        Console.Write("\n[Assistant]: Hello");
+        string topic = "";
+        while (topic != "exit")
+        {
+            Console.Write("\n[User]: ");
+            topic = Console.ReadLine();
+            if (topic == "exit") break;
+            Console.Write("\n[Assistant]: ");
+            conv = await agent.Run(topic, appendMessages: conv.Messages.ToList());
+            Console.Write(conv.Messages.Last().Content);
+        }
+    }
+
     public static ValueTask runEventHandler(AgentRunnerEvents runEvent)
     {
         switch (runEvent)
@@ -630,7 +653,7 @@ public class AgentsDemo : DemoBase
     [Flaky]
     public static async Task RunDnDRoleplayDemo()
     {
-        Console.WriteLine("Welcome Too Dungeon Masters");
+        Console.WriteLine("Welcome To Dungeon Masters");
         List<ChatMessage> AllContent = new List<ChatMessage>([new ChatMessage(ChatMessageRoles.User, "Start a new Dungeons and Dragons campaign with me.")]);
 
         string dungeonMasterInstructions = @"
@@ -645,6 +668,8 @@ IT IS ONLY YOU PLAYING.
 THE USER WILL DISCRIBE THE OUTCOME OF YOUR ACTIONS.
 THE USER WILL CREATE THE NEXT STEPS.
 ";
+
+
 
         TornadoAgent agentDungeonPlayer = new TornadoAgent(Program.Connect(), ChatModel.OpenAi.Gpt5.V5Mini, instructions: dungeonPlayerInstructions, streaming: true);
 
@@ -664,8 +689,6 @@ THE USER WILL CREATE THE NEXT STEPS.
 
         AllContent.Add(new ChatMessage(ChatMessageRoles.Assistant, dungeonMasterConv.Messages.Last().GetMessageContent()));
 
-
-
         Console.WriteLine("\n\n[PLAYER]:");
         Conversation playerDungeonConversation = await agentDungeonPlayer.Run(dungeonMasterConv.Messages.Last().Content, streaming: agentDungeonPlayer.Streaming, onAgentRunnerEvent: (evt) => {
             if (evt.EventType == AgentRunnerEventTypes.Streaming && evt is AgentRunnerStreamingEvent streamingEvent)
@@ -682,7 +705,7 @@ THE USER WILL CREATE THE NEXT STEPS.
 
         AllContent.Add(new ChatMessage(ChatMessageRoles.User, playerDungeonConversation.Messages.Last().GetMessageContent()));
 
-        ConversationCompressor compressor = new ConversationCompressor(Program.Connect(),20000, new ConversationCompressionOptions() 
+        ConversationCompressor compressor = new ConversationCompressor(Program.Connect(), 20000, new ConversationCompressionOptions() 
         { 
             CompressToolCallMessages = true,
             SummaryModel = ChatModel.OpenAi.Gpt5.V5Nano,
@@ -736,6 +759,112 @@ THE USER WILL CREATE THE NEXT STEPS.
         }
     }
 
+
+    [TornadoTest("DnD Roleplay along w/Qwen")]
+    [Flaky]
+    public static async Task RunDnDRoleplayQwenDemo()
+    {
+        string playerMessage = "";
+        Console.WriteLine("Welcome To Dungeon Masters");
+        List<ChatMessage> AllContent = new List<ChatMessage>([new ChatMessage(ChatMessageRoles.User, "Start a new Dungeons and Dragons campaign with me.")]);
+
+        string dungeonMasterInstructions = @"
+You are a Dungeons and Dragons Dungeon Master. You will guide the solo player through an epic adventure. You will role the dice for all interactions. Start by giving the player a character and explaining the scene and backstory. Task the Player with an action requirement at the end of each prompt.";
+
+
+
+        TornadoApi api = new TornadoApi(new Uri("http://localhost:11434")); // default Ollama port, API key can be passed in the second argument if needed
+        ChatModel model = new ChatModel("qwen3:14b");  // <-- replace with your model
+
+        TornadoAgent agentDungeonMaster = new TornadoAgent(api, model, tools: [RollDice], instructions: dungeonMasterInstructions, streaming: true);
+
+
+        //TornadoAgent agentDungeonPlayer = new TornadoAgent(Program.Connect(), ChatModel.OpenAi.Gpt5.V5Mini, instructions: dungeonPlayerInstructions, streaming: true);
+
+        //TornadoAgent agentDungeonMaster = new TornadoAgent(Program.Connect(), ChatModel.OpenAi.Gpt5.V5Nano, tools: [RollDice], instructions: dungeonMasterInstructions, streaming: true);
+
+        Console.WriteLine("\n\n[DUNGEON MASTER]:");
+        Conversation dungeonMasterConv = await agentDungeonMaster.Run(appendMessages: [new ChatMessage(ChatMessageRoles.User, "Start")], runnerOptions: new TornadoRunnerOptions() { SystemMessageAtStart = false},streaming: agentDungeonMaster.Streaming, onAgentRunnerEvent: (evt) => {
+            if (evt.EventType == AgentRunnerEventTypes.Streaming && evt is AgentRunnerStreamingEvent streamingEvent)
+            {
+                if (streamingEvent.ModelStreamingEvent is ModelStreamingOutputTextDeltaEvent deltaTextEvent)
+                {
+                    Console.Write(deltaTextEvent.DeltaText); // Write the text delta directly
+                }
+            }
+            return ValueTask.CompletedTask;
+        });
+
+        AllContent.Add(new ChatMessage(ChatMessageRoles.Assistant, ThinkRemover(dungeonMasterConv.Messages.Last().GetMessageContent())));
+
+
+
+        Console.WriteLine("\n\n[PLAYER]:");
+        playerMessage = Console.ReadLine() ?? "";
+
+        dungeonMasterConv.AddUserMessage("[PLAYER]:" + playerMessage);
+
+        AllContent.Add(new ChatMessage(ChatMessageRoles.User, "[PLAYER]:" + playerMessage));
+        ConversationCompressor compressor = new ConversationCompressor(Program.Connect(), 20000, new ConversationCompressionOptions()
+        {
+            CompressToolCallMessages = true,
+            SummaryModel = ChatModel.OpenAi.Gpt5.V5Nano,
+
+        });
+
+        while (true)
+        {
+            Console.WriteLine($"\n\nTokens: {AllContent.Sum(m => m.GetMessageTokens())}\n\n");
+
+            Console.WriteLine("\n\n[DUNGEON MASTER]:");
+            dungeonMasterConv = await agentDungeonMaster.Run(appendMessages: dungeonMasterConv.Messages.ToList(), streaming: true, onAgentRunnerEvent: (evt) => {
+                if (evt.EventType == AgentRunnerEventTypes.Streaming && evt is AgentRunnerStreamingEvent streamingEvent)
+                {
+                    if (streamingEvent.ModelStreamingEvent is ModelStreamingOutputTextDeltaEvent deltaTextEvent)
+                    {
+                        Console.Write(deltaTextEvent.DeltaText); // Write the text delta directly
+                    }
+                }
+                return ValueTask.CompletedTask;
+            });
+
+            AllContent.Add(new ChatMessage(ChatMessageRoles.Assistant, "[DUNGEON MASTER]: " + ThinkRemover(dungeonMasterConv.Messages.Last().GetMessageContent())));
+
+            Console.WriteLine("\n\n[PLAYER]:");
+
+            playerMessage = Console.ReadLine() ?? "";
+
+            dungeonMasterConv.AddUserMessage("[PLAYER]:" + playerMessage);
+
+            AllContent.Add(new ChatMessage(ChatMessageRoles.User, "[PLAYER]:" + playerMessage));
+
+            if (compressor.ShouldCompress(AllContent))
+            {
+                Console.WriteLine("\n--- Compressing Conversation ---\n");
+                AllContent = await compressor.Compress(AllContent);
+                Console.WriteLine("\n--- Compressed Messages ---\n");
+                Console.WriteLine(string.Join("\n\n", AllContent.Select(m => $"{m.Role}: {m.Content}")));
+                break;
+            }
+
+        }
+    }
+
+    public static string ThinkRemover(string input) 
+    {
+        const string startTag = "<think>";
+        const string endTag = "</think>";
+
+        int start = input.IndexOf(startTag, StringComparison.OrdinalIgnoreCase);
+        int end = input.IndexOf(endTag, StringComparison.OrdinalIgnoreCase);
+
+        if (start < 0 || end < 0 || end < start)
+        {
+            return input;
+        }
+
+        return input.Remove(start, (end - start) + endTag.Length).Trim();
+    }
 
     [TornadoTest("Compress Messages")]
     [Flaky]
