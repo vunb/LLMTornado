@@ -306,7 +306,7 @@ public class TornadoRunner
     {
         if (guardRail != null)
         {
-            GuardRailFunctionOutput? result = (GuardRailFunctionOutput?)(await AsyncHelpers.InvokeValueTaskFuncAsync(guardRail, [input]));
+            GuardRailFunctionOutput? result = (GuardRailFunctionOutput?)(await AsyncHelpers.InvokeValueTaskFuncAsync(guardRail, [input?.FirstOrDefault()?.Text]));
 
             if (result is { TripwireTriggered: true })
             {
@@ -586,6 +586,8 @@ public class TornadoRunner
 
             if (response.Exception != null)
             {
+                agent.LastRunExitReason = new ResponseErrorExitReason(response.Exception);
+
                 if(runnerCallback is not null) 
                 {
                     await runnerCallback.Invoke(new AgentRunnerErrorEvent(response.Exception.Message, chat, response.Exception));
@@ -606,12 +608,14 @@ public class TornadoRunner
         }
         catch (Exception ex)
         {
+            agent.LastRunExitReason = new RequestErrorExitReason(ex);
+
             if (runnerCallback is not null)
             {
                 await runnerCallback.Invoke(new AgentRunnerErrorEvent(ex.Message, chat, ex));
             }
 
-            if(runnerOptions?.ThrowOnResponseError ?? false)
+            if(runnerOptions?.ThrowOnRequestError ?? false)
             {
                throw;
             }
