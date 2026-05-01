@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LlmTornado.Agents.DataModels;
+﻿namespace LlmTornado.Agents.DataModels;
 
 public class TornadoRunnerOptions
 {
@@ -23,7 +17,7 @@ public class TornadoRunnerOptions
     /// </summary>
     public bool ThrowOnTokenLimitExceeded { get; set; } = false;
 
-        /// <summary>
+    /// <summary>
     /// Gets or sets a value indicating whether an exception should be thrown when the operation is canceled.
     /// </summary>
     public bool ThrowOnCancelled { get; set; } = false;
@@ -32,4 +26,19 @@ public class TornadoRunnerOptions
     /// Set the system message at the start of the conversation instead of the end. 
     /// </summary>
     public bool SystemMessageAtStart { get; set; } = false;
+
+    /// <summary>
+    /// Throw error on API expection or just log and continue. Default is false to avoid stopping the agent run due to transient API errors.
+    /// </summary>
+    public bool ThrowOnResponseError { get; set; } = false;
+
+    /// <summary>
+    /// Throw error on internal error during request processing or just log and continue. Default is false to avoid stopping the agent run due to transient errors.
+    /// </summary>
+    public bool ThrowOnRequestError { get; set; } = false;
+
+    /// <summary>
+    /// Throw error on tool failing or just log and continue. Default is false to avoid stopping the agent run due to transient tool errors.
+    /// </summary>
+    public bool ThrowOnToolError { get; set; } = false;
 }

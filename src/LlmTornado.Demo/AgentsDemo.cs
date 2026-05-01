@@ -759,11 +759,13 @@ THE USER WILL CREATE THE NEXT STEPS.
         }
     }
 
+    public static string ThinkMemory = "";
 
     [TornadoTest("DnD Roleplay along w/Qwen")]
     [Flaky]
     public static async Task RunDnDRoleplayQwenDemo()
     {
+        ThinkMemory = "";
         string playerMessage = "";
         Console.WriteLine("Welcome To Dungeon Masters");
         List<ChatMessage> AllContent = new List<ChatMessage>([new ChatMessage(ChatMessageRoles.User, "Start a new Dungeons and Dragons campaign with me.")]);
@@ -776,7 +778,7 @@ You are a Dungeons and Dragons Dungeon Master. You will guide the solo player th
         TornadoApi api = new TornadoApi(new Uri("http://localhost:11434")); // default Ollama port, API key can be passed in the second argument if needed
         ChatModel model = new ChatModel("qwen3:14b");  // <-- replace with your model
 
-        TornadoAgent agentDungeonMaster = new TornadoAgent(api, model, tools: [RollDice], instructions: dungeonMasterInstructions, streaming: true);
+        TornadoAgent agentDungeonMaster = new TornadoAgent(api, model, tools: [RollDice, CheckHistory, CheckLocationHistory, CheckPlayerHistory], instructions: dungeonMasterInstructions, streaming: true);
 
 
         //TornadoAgent agentDungeonPlayer = new TornadoAgent(Program.Connect(), ChatModel.OpenAi.Gpt5.V5Mini, instructions: dungeonPlayerInstructions, streaming: true);
@@ -805,12 +807,12 @@ You are a Dungeons and Dragons Dungeon Master. You will guide the solo player th
         dungeonMasterConv.AddUserMessage("[PLAYER]:" + playerMessage);
 
         AllContent.Add(new ChatMessage(ChatMessageRoles.User, "[PLAYER]:" + playerMessage));
-        ConversationCompressor compressor = new ConversationCompressor(Program.Connect(), 20000, new ConversationCompressionOptions()
-        {
-            CompressToolCallMessages = true,
-            SummaryModel = ChatModel.OpenAi.Gpt5.V5Nano,
+        //ConversationCompressor compressor = new ConversationCompressor(Program.Connect(), 20000, new ConversationCompressionOptions()
+        //{
+        //    CompressToolCallMessages = true,
+        //    SummaryModel = ChatModel.OpenAi.Gpt5.V5Nano,
 
-        });
+        //});
 
         while (true)
         {
@@ -838,16 +840,38 @@ You are a Dungeons and Dragons Dungeon Master. You will guide the solo player th
 
             AllContent.Add(new ChatMessage(ChatMessageRoles.User, "[PLAYER]:" + playerMessage));
 
-            if (compressor.ShouldCompress(AllContent))
-            {
-                Console.WriteLine("\n--- Compressing Conversation ---\n");
-                AllContent = await compressor.Compress(AllContent);
-                Console.WriteLine("\n--- Compressed Messages ---\n");
-                Console.WriteLine(string.Join("\n\n", AllContent.Select(m => $"{m.Role}: {m.Content}")));
-                break;
-            }
+            //if (compressor.ShouldCompress(AllContent))
+            //{
+            //    Console.WriteLine("\n--- Compressing Conversation ---\n");
+            //    AllContent = await compressor.Compress(AllContent);
+            //    Console.WriteLine("\n--- Compressed Messages ---\n");
+            //    Console.WriteLine(string.Join("\n\n", AllContent.Select(m => $"{m.Role}: {m.Content}")));
+            //    break;
+            //}
 
         }
+    }
+
+    [Description("Get history of thinking")]
+    public static string CheckHistory()
+    {
+        Console.WriteLine($"[Think Memory]: used");
+        return ThinkMemory;
+    }
+
+
+    [Description("Get history of player")]
+    public static string CheckPlayerHistory()
+    {
+        Console.WriteLine($"[Player history]: used");
+        return "Player is very cool";
+    }
+
+    [Description("Get history of location")]
+    public static string CheckLocationHistory()
+    {
+        Console.WriteLine("[Location history]: usedwhat");
+        return "Location is very cool, and dark, after a flood";
     }
 
     public static string ThinkRemover(string input) 
@@ -857,6 +881,8 @@ You are a Dungeons and Dragons Dungeon Master. You will guide the solo player th
 
         int start = input.IndexOf(startTag, StringComparison.OrdinalIgnoreCase);
         int end = input.IndexOf(endTag, StringComparison.OrdinalIgnoreCase);
+
+        ThinkMemory += (start >= 0 && end > start) ? input.Substring(start + startTag.Length, end - (start + startTag.Length)) + "\n" : "";
 
         if (start < 0 || end < 0 || end < start)
         {
